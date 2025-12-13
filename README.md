@@ -4,7 +4,7 @@ Solutions and tool for [Advent of Code](https://adventofcode.com/) in Rust.
 
 ## Features
 
-- [ ] Run solutions
+- [x] Run solutions
 - [ ] Input downloader
 - [ ] Puzzle downloader
 
