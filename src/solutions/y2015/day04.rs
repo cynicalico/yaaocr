@@ -37,9 +37,8 @@ pub fn parse(input: &str) -> (usize, usize) {
         threads.push(std::thread::spawn(move || {
             let mut i = tid + 1;
             loop {
-                if p1_ans.load(Ordering::Relaxed) != NOT_FOUND
-                    && p2_ans.load(Ordering::Relaxed) != NOT_FOUND
-                {
+                let curr_p2_ans = p2_ans.load(Ordering::Relaxed);
+                if curr_p2_ans != NOT_FOUND && i > curr_p2_ans {
                     break;
                 }
 
