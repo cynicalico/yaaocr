@@ -1,9 +1,12 @@
+#![feature(iter_array_chunks)]
+
 use crate::util::parse::ParseOps;
 use std::path::{Path, PathBuf};
 
 mod solutions {
     pub mod y2015 {
         pub mod day01;
+        pub mod day02;
     }
 }
 
@@ -79,4 +82,5 @@ macro_rules! make_solutions {
     }
 }
 
-make_solutions!(y2015 day01);
+make_solutions!(y2015
+    day01, day02);
