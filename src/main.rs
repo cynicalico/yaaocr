@@ -3,7 +3,7 @@ use std::error::Error;
 use std::io::BufRead;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
-use yaaocr::{ParseError, Solution, filtered_solutions};
+use yaaocr::{Solution, filtered_solutions};
 
 /// Yet Another Advent of Code Runner
 #[derive(Debug, Parser)]
@@ -54,10 +54,29 @@ fn main() {
     }
 }
 
-fn answer_verification(actual: Option<String>, expected: Option<String>) -> String {
-    if let Some(actual) = actual
-        && let Some(expected) = expected
-    {
+fn try_read_expected(year: u32, day: u32, verify: bool) -> (Option<String>, Option<String>) {
+    let expected_path = PathBuf::from(format!("input/{year}/expected/{day:02}.txt"));
+    if verify && expected_path.exists() {
+        match std::fs::read_to_string(&expected_path) {
+            Ok(content) => {
+                let mut lines = content.lines();
+                (
+                    lines.next().map(|s| s.to_owned()),
+                    lines.next().map(|s| s.to_owned()),
+                )
+            }
+            Err(err) => {
+                eprintln!("  Failed to read '{}': {err}", expected_path.display());
+                (None, None)
+            }
+        }
+    } else {
+        (None, None)
+    }
+}
+
+fn verification_str(actual: String, expected: Option<String>) -> String {
+    if let Some(expected) = expected {
         if actual == expected {
             " ✓".to_owned()
         } else {
@@ -75,55 +94,44 @@ fn run(
     verify: bool,
     totals: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let mut duration = Duration::ZERO;
-    for Solution {
-        year,
-        day,
-        input_path,
-        wrapper,
-    } in filtered_solutions(year, day)
-    {
-        let input_path = input_path_override.as_ref().unwrap_or(&input_path);
+    let mut total_elapsed = Duration::ZERO;
 
-        let expected_path = format!("input/{year}/expected/{day:02}.txt");
-        let (part1_expected, part2_expected) =
-            if verify && Path::new(expected_path.as_str()).exists() {
-                let contents = std::fs::read(expected_path)?;
-                let mut lines = contents.lines();
-                (
-                    lines.next().map(|r| r.ok()).flatten(),
-                    lines.next().map(|r| r.ok()).flatten(),
-                )
-            } else {
-                (None, None)
-            };
+    for Solution { year, day, wrapper } in filtered_solutions(year, day) {
+        let input_path = input_path_override
+            .clone()
+            .unwrap_or(PathBuf::from(format!("input/{year}/{day:02}.txt")));
 
-        println!("{year} Day {day:02}");
+        if !input_path.exists() {
+            eprintln!("{year} Day {day:02}");
+            eprintln!("  Missing input!");
+            eprintln!("  Place input file at '{}'", input_path.display());
+        } else {
+            match std::fs::read_to_string(&input_path) {
+                Ok(input) => {
+                    println!("{year} Day {day:02}");
 
-        let instant = Instant::now();
-        match wrapper(input_path.to_str().unwrap()) {
-            Ok((part1, part2)) => {
-                let elapsed = instant.elapsed();
-                duration += elapsed;
+                    let instant = Instant::now();
+                    let (part1, part2) = wrapper(&input);
+                    let elapsed = instant.elapsed();
+                    total_elapsed += elapsed;
 
-                println!(
-                    "  Part 1: {}{}",
-                    part1.clone().unwrap_or("unsolved".to_owned()),
-                    answer_verification(part1, part1_expected)
-                );
-                println!(
-                    "  Part 2: {}{}",
-                    part2.clone().unwrap_or("unsolved".to_owned()),
-                    answer_verification(part2, part2_expected)
-                );
-                println!("Elapsed: {:.03}s", elapsed.as_nanos() as f64 / 1e9);
-            }
-            Err(err) => {
-                if let Ok(parse_err) = err.downcast::<ParseError>() {
-                    println!("  {parse_err}")
-                } else {
-                    println!("  Missing input!");
-                    println!("  Place input file in {}", input_path.display());
+                    let (part1_expected, part2_expected) = try_read_expected(year, day, verify);
+
+                    println!(
+                        "  Part 1: {}{}",
+                        part1.clone(),
+                        verification_str(part1, part1_expected)
+                    );
+                    println!(
+                        "  Part 2: {}{}",
+                        part2.clone(),
+                        verification_str(part2, part2_expected)
+                    );
+                    println!("Elapsed: {:.03}s", elapsed.as_nanos() as f64 / 1e9);
+                }
+                Err(err) => {
+                    eprintln!("{year} Day {day:02}");
+                    eprintln!("  Failed to read '{}': {err}", input_path.display());
                 }
             }
         }
@@ -134,7 +142,7 @@ fn run(
     if totals {
         println!(
             "Total elapsed time: {:.03}s",
-            duration.as_nanos() as f64 / 1e9
+            total_elapsed.as_nanos() as f64 / 1e9
         );
         println!();
     }

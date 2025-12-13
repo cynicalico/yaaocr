@@ -1,4 +1,4 @@
-use std::error::Error;
+use crate::util::parse::ParseOps;
 use std::path::PathBuf;
 
 mod solutions {
@@ -13,22 +13,10 @@ mod util {
     pub mod parse;
 }
 
-#[derive(Debug)]
-pub struct ParseError(String);
-
-impl Error for ParseError {}
-
-impl std::fmt::Display for ParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Failed to parse puzzle input: {}", self.0)
-    }
-}
-
 pub struct Solution {
     pub year: u32,
     pub day: u32,
-    pub input_path: PathBuf,
-    pub wrapper: fn(&str) -> Result<(Option<String>, Option<String>), Box<dyn Error>>,
+    pub wrapper: fn(&str) -> (String, String),
 }
 
 pub fn filtered_solutions(year: Option<u32>, day: Option<u32>) -> Vec<Solution> {
@@ -42,28 +30,21 @@ pub fn filtered_solutions(year: Option<u32>, day: Option<u32>) -> Vec<Solution> 
 macro_rules! make_solutions {
     ($year:tt $($day:tt),*) => {
         fn $year() -> Vec<Solution> {
-            vec![$({
-                use crate::util::parse::ParseOps;
+            vec![$(
+                Solution {
+                    year: stringify!($year).unsigned(),
+                    day: stringify!($day).unsigned(),
+                    wrapper: |input: &str| {
+                        use solutions::$year::$day::*;
 
-                let year: u32 = stringify!($year).unsigned();
-                let day: u32 = stringify!($day).unsigned();
+                        let parsed_input = parse(&input);
+                        let part1 = part1(&parsed_input).to_string();
+                        let part2 = part2(&parsed_input).to_string();
 
-                let input_path = std::path::Path::new("input")
-                    .join(format!("{}", year))
-                    .join(format!("{:02}", day))
-                    .with_extension("txt");
-
-                let wrapper = |filepath: &str| {
-                    use solutions::$year::$day::*;
-
-                    let input = std::fs::read_to_string(filepath)?;
-                    let parsed = parse(&input)?;
-
-                    Ok((part1(&parsed).map(|v| v.to_string()), part2(&parsed).map(|v| v.to_string())))
-                };
-
-                Solution { year: year, day: day, input_path, wrapper }
-            },)*]
+                        (part1, part2)
+                    }
+                }
+            ,)*]
         }
     }
 }
