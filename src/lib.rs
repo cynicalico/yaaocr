@@ -3,19 +3,6 @@
 use crate::util::parse::ParseOps;
 use std::path::{Path, PathBuf};
 
-mod solutions {
-    pub mod y2015 {
-        pub mod day01;
-        pub mod day02;
-    }
-}
-
-mod util {
-    pub mod bits;
-    pub mod integer;
-    pub mod parse;
-}
-
 pub mod aoc_proxy;
 pub mod runner;
 
@@ -60,6 +47,20 @@ pub fn filtered_solutions(year: Option<u32>, day: Option<u32>) -> Vec<Solution> 
         .collect()
 }
 
+mod util {
+    pub mod bits;
+    pub mod integer;
+    pub mod parse;
+}
+
+mod solutions {
+    pub mod y2015 {
+        pub mod day01;
+        pub mod day02;
+        pub mod day03;
+    }
+}
+
 macro_rules! make_solutions {
     ($year:tt $($day:tt),*) => {
         fn $year() -> Vec<Solution> {
@@ -83,4 +84,4 @@ macro_rules! make_solutions {
 }
 
 make_solutions!(y2015
-    day01, day02);
+    day01, day02, day03);
