@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::ops::*;
 
 pub trait Integer<T>:

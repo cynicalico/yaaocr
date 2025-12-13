@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::util::integer::*;
 
 pub trait BitOps<T> {

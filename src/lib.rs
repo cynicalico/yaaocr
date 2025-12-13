@@ -1,5 +1,5 @@
 use crate::util::parse::ParseOps;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 mod solutions {
     pub mod y2015 {
@@ -11,6 +11,36 @@ mod util {
     pub mod bits;
     pub mod integer;
     pub mod parse;
+}
+
+pub mod aoc_proxy;
+pub mod runner;
+
+pub fn check_year_day(year: u32, day: u32) -> bool {
+    (year >= 2015 && year < 2025 && day >= 1 && day <= 25)
+        || (year == 2025 && day >= 1 && day <= 12)
+}
+
+pub fn input_path(year: u32, day: u32) -> PathBuf {
+    Path::new("input")
+        .join(format!("{year}"))
+        .join(format!("day{day:02}"))
+        .with_extension("txt")
+}
+
+pub fn expected_path(year: u32, day: u32) -> PathBuf {
+    Path::new("input")
+        .join(format!("{year}"))
+        .join("expected")
+        .join(format!("day{day:02}"))
+        .with_extension("txt")
+}
+
+pub fn puzzle_path(year: u32, day: u32) -> PathBuf {
+    Path::new("puzzle")
+        .join(format!("{year}"))
+        .join(format!("day{day:02}"))
+        .with_extension("md")
 }
 
 pub struct Solution {
