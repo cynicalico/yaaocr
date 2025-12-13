@@ -19,7 +19,7 @@ pub fn input_path(year: u32, day: u32) -> PathBuf {
 }
 
 pub fn expected_path(year: u32, day: u32) -> PathBuf {
-    Path::new("input")
+    Path::new("puzzle")
         .join(format!("{year}"))
         .join("expected")
         .join(format!("day{day:02}"))
