@@ -8,7 +8,7 @@ pub mod runner;
 
 pub fn check_year_day(year: u32, day: u32) -> bool {
     (year >= 2015 && year < 2025 && day >= 1 && day <= 25)
-        || (year == 2025 && day >= 1 && day <= 12)
+        || (year >= 2025 && day >= 1 && day <= 12)
 }
 
 pub fn input_path(year: u32, day: u32) -> PathBuf {
