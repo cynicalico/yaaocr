@@ -52,6 +52,18 @@ enum Command {
         #[arg(short, long, required = false)]
         force: bool,
     },
+
+    /// Submit answers
+    Submit {
+        /// Year to submit
+        year: u32,
+
+        /// Day to submit
+        day: u32,
+
+        /// Which part to submit
+        what: aoc_proxy::PuzzlePart,
+    },
 }
 
 fn main() {
@@ -71,6 +83,7 @@ fn main() {
             what,
             force,
         } => aoc_proxy::download(year, day, what, force),
+        Command::Submit { year, day, what } => aoc_proxy::submit(year, day, what),
     } {
         eprintln!("Error: {err}");
     }
