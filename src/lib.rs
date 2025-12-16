@@ -7,8 +7,8 @@ pub mod aoc_proxy;
 pub mod runner;
 
 pub fn check_year_day(year: u32, day: u32) -> bool {
-    (year >= 2015 && year < 2025 && day >= 1 && day <= 25)
-        || (year >= 2025 && day >= 1 && day <= 12)
+    ((2015..2025).contains(&year) && (1..=25).contains(&day))
+        || ((2025..).contains(&year) && (1..=12).contains(&day))
 }
 
 pub fn input_path(year: u32, day: u32) -> PathBuf {
@@ -138,10 +138,11 @@ mod solutions {
         pub mod day06;
         pub mod day07;
         pub mod day08;
+        pub mod day09;
     }
 }
 
 make_solutions!(y2015
     day01, day02, day03, day04, day05,
-    day06, day07, day08);
+    day06, day07, day08, day09);
 /*[[[end]]]*/
