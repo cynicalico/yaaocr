@@ -45,6 +45,7 @@ enum Command {
         day: u32,
 
         /// What to download
+        #[arg(required = false, default_value = "both")]
         what: aoc_proxy::DownloadTarget,
 
         /// Force download

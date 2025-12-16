@@ -1,3 +1,5 @@
+<img src="icon.svg" width="128" alt="Ferris, the Rust language mascot, wearing a Santa hat">
+
 # Yet Another Advent of Code Runner
 
 Solutions and tool for [Advent of Code](https://adventofcode.com/) in Rust.
