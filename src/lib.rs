@@ -43,7 +43,7 @@ pub fn filtered_solutions(year: Option<u32>, day: Option<u32>) -> Vec<Solution> 
     std::iter::empty()
         .chain(y2015())
         .filter(|s| year.is_none_or(|y| y == s.year))
-        .filter(|s| day.is_none_or(|y| y == s.day))
+        .filter(|s| day.is_none_or(|d| d == s.day))
         .collect()
 }
 
@@ -51,18 +51,6 @@ mod util {
     pub mod bits;
     pub mod integer;
     pub mod parse;
-}
-
-mod solutions {
-    pub mod y2015 {
-        pub mod day01;
-        pub mod day02;
-        pub mod day03;
-        pub mod day04;
-        pub mod day05;
-        pub mod day06;
-        pub mod day07;
-    }
 }
 
 macro_rules! make_solutions {
@@ -87,6 +75,72 @@ macro_rules! make_solutions {
     }
 }
 
+/*[[[cog
+import os
+import re
+
+SOLUTIONS_DIR = os.path.join("src", "solutions")
+
+year_re = re.compile(r"^y(\d{4})$")
+day_re  = re.compile(r"^day(\d{2})\.rs$")
+
+def year_key(yname: str) -> int:
+    m = year_re.match(yname)
+    return int(m.group(1)) if m else 0
+
+def chunked(xs, n):
+    for i in range(0, len(xs), n):
+        yield xs[i:i+n]
+
+years = []
+for entry in os.listdir(SOLUTIONS_DIR):
+    if year_re.match(entry) and os.path.isdir(os.path.join(SOLUTIONS_DIR, entry)):
+        years.append(entry)
+
+cog.outl("mod solutions {")
+for year in sorted(years, key=year_key):
+    year_path = os.path.join(SOLUTIONS_DIR, year)
+    days = []
+    for fname in os.listdir(year_path):
+        m = day_re.match(fname)
+        if m and os.path.isfile(os.path.join(year_path, fname)):
+            days.append(m.group(1))
+
+    cog.outl(f"    pub mod {year} {{")
+    for dd in sorted(set(days)):
+        cog.outl(f"        pub mod day{dd};")
+    cog.outl("    }")
+cog.outl("}")
+
+for year in sorted(years, key=year_key):
+    year_path = os.path.join(SOLUTIONS_DIR, year)
+    days = []
+    for fname in os.listdir(year_path):
+        m = day_re.match(fname)
+        if m and os.path.isfile(os.path.join(year_path, fname)):
+            days.append(f"day{m.group(1)}")
+
+    days = sorted(set(days))
+
+    cog.outl()
+    cog.outl(f"make_solutions!({year}")
+    for group in chunked(days, 5):
+        cog.out("    " + ", ".join(group))
+        cog.outl(");" if group == days[-len(group):] else ",")
+]]]*/
+mod solutions {
+    pub mod y2015 {
+        pub mod day01;
+        pub mod day02;
+        pub mod day03;
+        pub mod day04;
+        pub mod day05;
+        pub mod day06;
+        pub mod day07;
+    }
+}
+
 make_solutions!(y2015
     day01, day02, day03, day04, day05,
     day06, day07);
+/*[[[end]]]*/
